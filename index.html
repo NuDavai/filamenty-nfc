@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karta Filamentu - Pracownia 3D</title>
+    <style>
+        /* Stylizacja dostosowana do ekranów smartfonów */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #343a40;
+        }
+        .card {
+            background: #ffffff;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+        }
+        /* Dynamiczny baner górny */
+        .card-header {
+            height: 140px;
+            background-color: #343a40; /* Kolor domyślny */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: background-color 0.5s ease;
+        }
+        .logo-text {
+            color: white;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .logo-img {
+            max-height: 80px;
+            max-width: 80%;
+            display: none; /* Domyślnie ukryte, włącza się, gdy znajdzie logo w JS */
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+        }
+        .card-body {
+            padding: 40px 20px 30px;
+        }
+        .filament-type {
+            font-size: 42px;
+            font-weight: 800;
+            color: #212529;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+        .filament-color {
+            font-size: 20px;
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 25px;
+        }
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #495057;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #adb5bd;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="card-header" id="dynamicBanner">
+            <!-- Obrazek logo (jeśli jest w bazie) lub tekst producenta -->
+            <img id="brandLogo" class="logo-img" src="" alt="Logo Producenta">
+            <span id="brandText" class="logo-text">PRODUCENT</span>
+        </div>
+        <div class="card-body">
+            <div class="filament-type" id="filType">TYP</div>
+            <div class="filament-color" id="filColor">Kolor filamentu</div>
+            
+            <div class="badge-container">
+                <span class="badge">NFC Verified ✅</span>
+                <span class="badge">Pracownia 3D</span>
+            </div>
+            
+            <div class="footer">
+                Zeskanowano z łódeczki Benchy
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. ODCZYTYWANIE DANYCH Z LINKU (URL)
+        const params = new URLSearchParams(window.location.search);
+        
+        // Zabezpieczenie przed pustymi linkami (wartości domyślne)
+        const producent = params.get('producent') || 'Nieznany';
+        const typ = params.get('typ') || 'Brak danych';
+        const kolor = params.get('kolor') || 'Nieznany kolor';
+        const hex = params.get('hex'); // Opcjonalny parametr z kolorem HEX, np. FF0000
+
+        // 2. AKTUALIZACJA TEKSTÓW NA STRONIE
+        document.getElementById('brandText').innerText = producent;
+        document.getElementById('filType').innerText = typ;
+        document.getElementById('filColor').innerText = kolor;
+
+        // 3. BAZA LOGOTYPÓW (Linki do przezroczystych obrazków PNG/SVG)
+        // Kluczem jest nazwa producenta pisana małymi literami
+        const logotypy = {
+            'sunlu': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Sunlu_logo.png/320px-Sunlu_logo.png', // Przykładowy link
+            'bambu lab': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Bambu_Lab_logo.svg/320px-Bambu_Lab_logo.svg.png',
+            'prusa': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Prusa_Research_logo.svg/320px-Prusa_Research_logo.svg.png',
+            'fiberlogy': 'https://fiberlogy.com/wp-content/themes/fiberlogy/img/logo.svg' // Zastąpcie to własnymi hostowanymi plikami, żeby nie wygasły
+        };
+
+        const ujednoliconyProducent = producent.toLowerCase().trim();
+        
+        // Jeśli producent jest w naszej bazie logotypów, ukryj tekst i pokaż obrazek
+        if (logotypy[ujednoliconyProducent]) {
+            const logoImg = document.getElementById('brandLogo');
+            logoImg.src = logotypy[ujednoliconyProducent];
+            logoImg.style.display = 'block';
+            document.getElementById('brandText').style.display = 'none';
+        }
+
+        // 4. KOLOROWANIE BANERU
+        // Jeśli w linku podano parametr hex (np. &hex=87CEEB), pomaluj baner na ten kolor
+        if (hex) {
+            // Dodajemy # na początku, jeśli ktoś zapomniał go wpisać w linku
+            const kolorHex = hex.startsWith('#') ? hex : '#' + hex;
+            document.getElementById('dynamicBanner').style.backgroundColor = kolorHex;
+        }
+    </script>
+</body>
+</html>
